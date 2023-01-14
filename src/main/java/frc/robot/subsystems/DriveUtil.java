@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -67,14 +69,16 @@ public class DriveUtil extends SubsystemBase {
         if (RobotContainer.getDriverBButton()){
             var result = camera.getLatestResult();
             if (result.hasTargets()){
-
+                PhotonTrackedTarget target = result.getBestTarget();
                 double range = PhotonUtils.calculateDistanceToTargetMeters(
                     CAMERA_HEIGHT,
                     TARGET_HEIGHT,
                     CAMERA_PITCH_RADIANS,
-                    Units.degreesToRadians(result.getBestTarget().getPitch())
+                    Units.degreesToRadians(target.getPitch())
                 );
-                double rotationSpeed = 1 * range;
+                double yaw = target.getYaw();
+                double linearSpeed = 0.1 * range;
+                double rotationSpeed = 0.11 * yaw;
                 differentialDrive.arcadeDrive(0, rotationSpeed);
             }
         } else {
